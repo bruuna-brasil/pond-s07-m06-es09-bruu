@@ -1,0 +1,29 @@
+<!-- templates/update_story_select.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Story to Update</title>
+</head>
+<body>
+    <h1>Select Story to Update</h1>
+    {% if stories %}
+        <ul>
+            {% for story in stories %}
+                <li>
+                    <strong>{{ story.title }}</strong><br>
+                    {{ story.description }}<br>
+                    <em>{{ story.category }}</em><br>
+                    <button onclick="location.href='/generate_content?story_id={{ story.id }}'">Update Story</button>
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No stories found.</p>
+    {% endif %}
+    <button onclick="location.href='/'">Back to Home</button>
+</body>
+</html>

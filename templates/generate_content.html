@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Content</title>
+    <script>
+        async function fillStoryInput() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var storyId = urlParams.get('story_id');
+            
+            // Faz uma solicitação para a API para obter os detalhes da história
+            var response = await fetch('/api/stories/' + storyId);
+            var story = await response.json();
+            
+            // Preenche o campo de entrada com os detalhes da história
+            var storyInput = document.getElementById('story_input');
+            storyInput.value = 'Título: ' + story.title + ', Descrição: ' + story.description + ', Categoria: ' + story.category;
+        }
+        
+        async function updateStory() {
+            var storyInput = document.getElementById('story_input');
+            var storyId = getStoryIdFromUrl();
+            
+            // Faz uma solicitação para a API para atualizar a descrição da história
+            var response = await fetch('/api/stories/' + storyId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    description: storyInput.value
+                })
+            });
+            
+            // Obtém a resposta da API
+            var updatedStory = await response.json();
+            
+            // Atualiza o campo de entrada com a nova descrição da história
+            storyInput.value = updatedStory.description;
+        }
+        
+        // Chama a função quando a página é carregada
+        window.onload = fillStoryInput;
+    </script>
+</head>
+<body>
+    <!-- Formulário para enviar entrada do usuário -->
+    <form action="/" method="post" onsubmit="event.preventDefault(); updateStory();">
+        <label for="story_input">Story Input:</label><br>
+        <input type="text" id="story_input" name="story_input"><br>
+        <input type="submit" value="Atualizar" name="update"><br>
+        <input type="submit" value="Gerar de novo" name="generate"><br>
+        <a href="index.html">Retornar</a>
+    </form>
+    
+    <!-- Exibir resposta do ChatBot -->
+    {% if response_data %}
+        <p style="padding-top: 30px; font-size: 18px; width: 50%;">{{ response_data }}</p>
+    {% endif %}
+</body>
+</html>
