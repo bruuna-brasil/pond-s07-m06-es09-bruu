@@ -69,6 +69,14 @@ async def list_stories_page(request: Request, db: Session = Depends(get_db)):
     stories = get_stories(db)
     return templates.TemplateResponse("list_stories.html", {"request": request, "stories": stories})
 
+@app.get("/update_story/{story_id}", response_class=HTMLResponse)
+async def update_story_page(story_id: int, request: Request, db: Session = Depends(get_db)):
+    story = db.query(Story).filter(Story.id == story_id).first()
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+
+    return templates.TemplateResponse("update_story.html", {"request": request, "story": story})
+
 @app.get("/update_story_select", response_class=HTMLResponse)
 async def update_story_select_page(request: Request, db: Session = Depends(get_db)):
     stories = get_stories(db)
@@ -86,7 +94,7 @@ async def list_users_page(request: Request):
 async def show_docs(request: Request):
     return templates.TemplateResponse("docs.html", {"request": request})
 
-@app.get("/generate_content/{story_id}", response_class=HTMLResponse)
+@app.get("/generate_content?story_id={story_id}", response_class=HTMLResponse)
 async def generate_content(story_id: int, request: Request, db: Session = Depends(get_db)):
     story = db.query(Story).filter(Story.id == story_id).first()
     if not story:

@@ -1,62 +1,65 @@
+<!-- templates/generate_content.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Content</title>
-    <script>
-        async function fillStoryInput() {
-            var urlParams = new URLSearchParams(window.location.search);
-            var storyId = urlParams.get('story_id');
-            
-            // Faz uma solicitação para a API para obter os detalhes da história
-            var response = await fetch('/api/stories/' + storyId);
-            var story = await response.json();
-            
-            // Preenche o campo de entrada com os detalhes da história
-            var storyInput = document.getElementById('story_input');
-            storyInput.value = 'Título: ' + story.title + ', Descrição: ' + story.description + ', Categoria: ' + story.category;
-        }
-        
-        async function updateStory() {
-            var storyInput = document.getElementById('story_input');
-            var storyId = getStoryIdFromUrl();
-            
-            // Faz uma solicitação para a API para atualizar a descrição da história
-            var response = await fetch('/api/stories/' + storyId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    description: storyInput.value
-                })
-            });
-            
-            // Obtém a resposta da API
-            var updatedStory = await response.json();
-            
-            // Atualiza o campo de entrada com a nova descrição da história
-            storyInput.value = updatedStory.description;
-        }
-        
-        // Chama a função quando a página é carregada
-        window.onload = fillStoryInput;
-    </script>
 </head>
 <body>
-    <!-- Formulário para enviar entrada do usuário -->
-    <form action="/" method="post" onsubmit="event.preventDefault(); updateStory();">
-        <label for="story_input">Story Input:</label><br>
-        <input type="text" id="story_input" name="story_input"><br>
-        <input type="submit" value="Atualizar" name="update"><br>
-        <input type="submit" value="Gerar de novo" name="generate"><br>
-        <a href="index.html">Retornar</a>
+    <h1>Generate Content</h1>
+    <h2>Update Story</h2>
+    <!-- Form to update story description -->
+    <form id="update_form" action="/update_story" method="POST">
+        <!-- Inputs to display story data and allow user to update description -->
+        <div>
+            <label for="story_title">Title:</label><br>
+            <input type="text" id="story_title" name="story_title" value="" readonly><br>
+        </div>
+        <div>
+            <label for="story_description">Description:</label><br>
+            <textarea id="story_description" name="story_description" rows="4" cols="50"></textarea><br>
+        </div>
+        <div>
+            <label for="story_category">Category:</label><br>
+            <input type="text" id="story_category" name="story_category" value="" readonly><br>
+        </div>
+        <!-- Button to submit updated description -->
+        <button type="submit">Update Description</button>
     </form>
-    
-    <!-- Exibir resposta do ChatBot -->
-    {% if response_data %}
-        <p style="padding-top: 30px; font-size: 18px; width: 50%;">{{ response_data }}</p>
-    {% endif %}
+    <!-- Button to return to story selection -->
+    <button onclick="location.href='/update_story_select'">Back to Story Selection</button>
+
+    <script>
+        // Function to extract story ID from URL
+        function getStoryIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('story_id');
+        }
+
+        // Function to fetch story data based on ID
+        function fetchStoryData(storyId) {
+            fetch(`/api/get_story?story_id=${storyId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate fields with story data
+                    document.getElementById('story_title').value = data.title;
+                    document.getElementById('story_description').value = data.description;
+                    document.getElementById('story_category').value = data.category;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Function to be called when the page loads
+        window.onload = function() {
+            const storyId = getStoryIdFromUrl();
+            if (storyId) {
+                fetchStoryData(storyId);
+            }
+        };
+    </script>
 </body>
 </html>

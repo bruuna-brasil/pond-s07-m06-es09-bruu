@@ -16,8 +16,8 @@
                     <strong>{{ story.title }}</strong><br>
                     {{ story.description }}<br>
                     <em>{{ story.category }}</em><br>
+                    <!-- Update button with URL parameters -->
                     <button onclick="location.href='/generate_content?story_id={{ story.id }}'">Update Story</button>
-
                 </li>
             {% endfor %}
         </ul>
